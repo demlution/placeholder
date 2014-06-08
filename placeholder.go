@@ -16,7 +16,8 @@ import (
 
 var (
 	imageQuality             = jpeg.Options{95}
-	bgColor         color.Color = color.RGBA{170, 170, 170, 1}
+	bgColor      color.Color = color.RGBA{170, 170, 170, 1}
+	fontColor      color.Color = color.White
 	fontSize                 = 30
 	fontSpacing              = 1.5
 )
@@ -68,14 +69,19 @@ func HexToRGB(h Hex) (uint8, uint8, uint8) {
 	}
 	return 0, 0, 0
 }
-/* ************************************************************************** */
 
+/* ************************************************************************** */
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	params := strings.Split(r.URL.Path[1:], "/")
+	if len(params) == 3 {
+		r, g, b := HexToRGB(Hex(params[2]))
+		fontColor = color.RGBA{r, g, b, 255}
+	}
+
 	if len(params) == 2 {
 		r, g, b := HexToRGB(Hex(params[1]))
-		bgColor = color.RGBA{r, g, b, 1}
+		bgColor = color.RGBA{r, g, b, 255}
 	}
 	size := strings.Split(params[0], "x")
 	if len(size) < 2 {
@@ -105,7 +111,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	c.SetFontSize(float64(fontSize))
 	c.SetClip(m.Bounds())
 	c.SetDst(m)
-	c.SetSrc(image.White)
+	src := image.NewUniform(fontColor)
+	c.SetSrc(src)
 	c.SetHinting(freetype.FullHinting)
 
 	text := fmt.Sprintf("%d X %d", width, height)
