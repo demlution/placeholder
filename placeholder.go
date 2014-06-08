@@ -17,7 +17,7 @@ import (
 var (
 	imageQuality             = jpeg.Options{95}
 	bgColor      color.Color = color.RGBA{170, 170, 170, 1}
-	fontColor      color.Color = color.White
+	fontColor    color.Color = color.White
 	fontSize                 = 30
 	fontSpacing              = 1.5
 )
@@ -83,17 +83,17 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		r, g, b := HexToRGB(Hex(params[1]))
 		bgColor = color.RGBA{r, g, b, 255}
 	}
+
 	size := strings.Split(params[0], "x")
-	if len(size) < 2 {
-		return
-	}
-	width, err := strconv.Atoi(size[0])
-	if err != nil {
-		width = 0
-	}
-	height, err := strconv.Atoi(size[1])
-	if err != nil {
-		height = 0
+
+	var width, height int
+
+	if len(size) == 1 {
+		width, _ = strconv.Atoi(size[0])
+		height = width
+	} else {
+		width, _ = strconv.Atoi(size[0])
+		height, _ = strconv.Atoi(size[1])
 	}
 
 	m := image.NewRGBA(image.Rect(0, 0, width, height))
