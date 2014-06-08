@@ -16,7 +16,7 @@ import (
 
 var (
         imageQuality = jpeg.Options{95}
-	blue  color.Color = color.RGBA{0, 0, 255, 255}
+	blue  color.Color = color.RGBA{170, 170, 170, 1}
 	fontSize = 30
 	fontSpacing = 1.5
 )
