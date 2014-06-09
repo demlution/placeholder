@@ -15,11 +15,15 @@ import (
 )
 
 var (
+	// fontPath = "/usr/share/fonts/TTF/luxisr.ttf"
+	// fontPath = "/usr/share/fonts/wqy-microhei/wqy-microhei.ttc"
+	fontPath = "/usr/share/fonts/wps-office/FZYTK.TTF"
 	imageQuality             = jpeg.Options{95}
 	bgColor      color.Color = color.RGBA{170, 170, 170, 1}
 	fontColor    color.Color = color.White
 	fontSize                 = 30
 	fontSpacing              = 1.5
+	text  string
 )
 
 /* ************************************************************************** */
@@ -79,7 +83,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		fontColor = color.RGBA{r, g, b, 255}
 	}
 
-	if len(params) == 2 {
+	if len(params) >= 2 {
 		r, g, b := HexToRGB(Hex(params[1]))
 		bgColor = color.RGBA{r, g, b, 255}
 	}
@@ -96,10 +100,15 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		height, _ = strconv.Atoi(size[1])
 	}
 
+	texts := r.URL.Query()["text"]
+	if len(texts) > 0 {
+		text = texts[0]
+	}
+
 	m := image.NewRGBA(image.Rect(0, 0, width, height))
 	draw.Draw(m, m.Bounds(), &image.Uniform{bgColor}, image.ZP, draw.Src)
 
-	fontBytes, err := ioutil.ReadFile("/usr/share/fonts/TTF/luxisr.ttf")
+	fontBytes, err := ioutil.ReadFile(fontPath)
 	font, err := freetype.ParseFont(fontBytes)
 	if err != nil {
 		log.Println(err)
@@ -115,7 +124,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	c.SetSrc(src)
 	c.SetHinting(freetype.FullHinting)
 
-	text := fmt.Sprintf("%d X %d", width, height)
+	if len(text) == 0 {
+		text = fmt.Sprintf("%d X %d", width, height)
+	}
 	x0 := width/2 - len(text)*fontSize/3
 	y0 := height / 2
 	pt := freetype.Pt(x0, y0)
