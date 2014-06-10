@@ -12,18 +12,19 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 var (
 	// fontPath = "/usr/share/fonts/TTF/luxisr.ttf"
 	// fontPath = "/usr/share/fonts/wqy-microhei/wqy-microhei.ttc"
-	fontPath = "/usr/share/fonts/wps-office/FZYTK.TTF"
+	fontPath                 = "/usr/share/fonts/wps-office/FZYTK.TTF"
 	imageQuality             = jpeg.Options{95}
 	bgColor      color.Color = color.RGBA{170, 170, 170, 1}
 	fontColor    color.Color = color.White
 	fontSize                 = 30
 	fontSpacing              = 1.5
-	text  string
+	text         string
 )
 
 /* ************************************************************************** */
@@ -124,11 +125,16 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	c.SetSrc(src)
 	c.SetHinting(freetype.FullHinting)
 
+	emSquarePix := int(c.PointToFix32(float64(fontSize)) >> 8)
+
 	if len(text) == 0 {
 		text = fmt.Sprintf("%d X %d", width, height)
 	}
-	x0 := width/2 - len(text)*fontSize/3
+	textCount := utf8.RuneCountInString(text)
+
+	x0 := (width - textCount*emSquarePix) / 2
 	y0 := height / 2
+
 	pt := freetype.Pt(x0, y0)
 	c.DrawString(text, pt)
 	w.Header().Set("Content-Type", "image/jpeg")
