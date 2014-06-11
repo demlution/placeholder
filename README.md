@@ -28,3 +28,8 @@ Height is optional, if no height is specified the image will be a square.
 ## Text
 
     http://localhost:8080/350x150?text=Golang+Placeholder
+
+
+# TODO
+
++ Text break line support
